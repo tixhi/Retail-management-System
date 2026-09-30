@@ -36,6 +36,8 @@ Create the first administrator once:
 npm --prefix backend run seed:admin
 ```
 
+Set `ADMIN_SIGNUP_CODE` in the root `.env` to a long, private invite code and restart the backend to enable Admin signup from the login screen. Anyone with that code can create an Admin account. Alternatively, after signing in with a database-backed administrator, use **Settings → Add administrator**. Passwords are hashed before storage.
+
 The application does not load sample records. Import or create your operational data after signing in. The LMS integration still requires its API documentation or a representative export and field mapping.
 
 ## Tech stack

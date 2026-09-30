@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Activity, ArrowUpRight, Box, CircleDollarSign, PackageCheck, ShieldAlert, Truck, Warehouse } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import api from '../../services/api';
 import StatCard from '../../components/common/StatCard';
@@ -17,67 +16,13 @@ export default function DashboardPage() {
       .then((response) => setData(response.data.data))
       .catch((requestError) => {
         setError(requestError?.response?.data?.message || 'Could not load live dashboard data. Check the API and database connection.');
-        setData({
-          kpis: [
-            { title: 'Total Products', value: 248, change: '+12% vs last month', tone: 'blue', icon: Box },
-            { title: 'Total Inventory', value: 18420, change: '+8.4% vs last month', tone: 'green', icon: PackageCheck },
-            { title: 'Low Stock Items', value: 17, change: '5 critical', tone: 'amber', icon: ShieldAlert },
-            { title: 'Pending Orders', value: 42, change: '12 due today', tone: 'red', icon: Activity },
-            { title: 'Active Warehouses', value: 3, change: '2 operating at full capacity', tone: 'purple', icon: Warehouse },
-            { title: 'Active Suppliers', value: 18, change: '+3 this quarter', tone: 'blue', icon: Truck },
-            { title: 'Purchase Orders', value: 24, change: '8 pending approval', tone: 'amber', icon: ArrowUpRight },
-            { title: 'Inventory Value', value: '₹27.8L', change: '+₹3.1L this month', tone: 'green', icon: CircleDollarSign },
-          ],
-          trend: [
-            { month: 'Jan', sales: 120000 },
-            { month: 'Feb', sales: 145000 },
-            { month: 'Mar', sales: 168000 },
-            { month: 'Apr', sales: 155000 },
-            { month: 'May', sales: 179000 },
-            { month: 'Jun', sales: 195000 },
-          ],
-          inventoryMovement: [
-            { name: 'Stock In', value: 420 },
-            { name: 'Stock Out', value: 310 },
-            { name: 'Transfers', value: 160 },
-            { name: 'Adjustments', value: 90 },
-          ],
-          warehouseDistribution: [
-            { name: 'Mumbai', value: 42 },
-            { name: 'Bengaluru', value: 33 },
-            { name: 'Delhi', value: 25 },
-          ],
-          topProducts: [
-            { name: 'Wireless Mouse', units: 380 },
-            { name: 'USB Cable', units: 355 },
-            { name: 'Laptop', units: 320 },
-            { name: 'Monitor', units: 290 },
-            { name: 'Router', units: 240 },
-          ],
-          recentOrders: [
-            { orderId: 'ORD-1042', customer: 'Aarav Retail', total: '₹57,200', status: 'Confirmed' },
-            { orderId: 'ORD-1045', customer: 'Karnataka Mart', total: '₹41,800', status: 'Packed' },
-            { orderId: 'ORD-1049', customer: 'CityHub', total: '₹21,450', status: 'Shipped' },
-          ],
-          lowStock: [
-            { item: 'Power Bank', warehouse: 'Mumbai', quantity: 8 },
-            { item: 'Webcam', warehouse: 'Bengaluru', quantity: 5 },
-            { item: 'Printer', warehouse: 'Delhi', quantity: 6 },
-          ],
-          transactions: [
-            { type: 'Stock In', product: 'Headphones', qty: '+40', warehouse: 'Mumbai' },
-            { type: 'Transfer', product: 'Keyboard', qty: '-18', warehouse: 'Delhi' },
-            { type: 'Adjustment', product: 'Monitor', qty: '+6', warehouse: 'Bengaluru' },
-          ],
-        });
       })
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading || !data) {
-    return <div className="card p-10 text-sm text-slate-500">Loading dashboard...</div>;
-  }
+  if (loading) return <div className="card p-10 text-sm text-slate-500">Loading dashboard...</div>;
   if (error) return <div role="alert" className="card p-6 text-sm text-red-700">{error}</div>;
+  if (!data) return <div className="card p-6 text-sm text-slate-500">No dashboard data is available.</div>;
 
   return (
     <div className="space-y-6">

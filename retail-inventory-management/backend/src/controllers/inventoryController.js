@@ -1,4 +1,4 @@
-const { Inventory, Transaction } = require('../models');
+const { Inventory, Transaction, Product, Warehouse } = require('../models');
 const { asyncHandler } = require('../middleware/asyncHandler');
 
 const getInventory = asyncHandler(async (req, res) => {
@@ -14,10 +14,29 @@ const adjustInventory = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Product, warehouse and quantity are required.' });
   }
 
-  const item = await Inventory.findOne({ productId, warehouseId });
+  let item = await Inventory.findOne({ productId, warehouseId });
 
   if (!item) {
-    return res.status(404).json({ success: false, message: 'Inventory record not found.' });
+    if (adjustment < 0) {
+      return res.status(404).json({ success: false, message: 'Inventory record not found for a stock reduction.' });
+    }
+    const [product, warehouse] = await Promise.all([
+      Product.findById(productId).lean(),
+      Warehouse.findById(warehouseId).lean(),
+    ]);
+    if (!product || !warehouse) {
+      return res.status(404).json({ success: false, message: 'Product or warehouse was not found.' });
+    }
+    item = new Inventory({
+      productId,
+      productName: product.name,
+      warehouseId,
+      warehouseName: warehouse.name,
+      currentStock: 0,
+      availableStock: 0,
+      reservedStock: 0,
+      reorderLevel: product.reorderLevel || 0,
+    });
   }
 
   if (item.availableStock + adjustment < 0 || item.currentStock + adjustment < 0) {
@@ -53,8 +72,9 @@ const transferStock = asyncHandler(async (req, res) => {
 
   const source = await Inventory.findOne({ productId, warehouseId: sourceWarehouseId });
   const destination = await Inventory.findOne({ productId, warehouseId: destinationWarehouseId });
+  const destinationWarehouse = await Warehouse.findById(destinationWarehouseId).lean();
 
-  if (!source || source.availableStock < qty) {
+  if (!destinationWarehouse || !source || source.availableStock < qty) {
     return res.status(400).json({ success: false, message: 'Insufficient stock at source warehouse.' });
   }
 
@@ -68,7 +88,7 @@ const transferStock = asyncHandler(async (req, res) => {
       productId,
       productName: source.productName,
       warehouseId: destinationWarehouseId,
-      warehouseName: req.body.destinationWarehouseName || 'Destination Warehouse',
+      warehouseName: destinationWarehouse.name,
       currentStock: qty,
       availableStock: qty,
       reservedStock: 0,
@@ -86,7 +106,7 @@ const transferStock = asyncHandler(async (req, res) => {
     type: 'Transfer',
     product: source.productName,
     from: source.warehouseName,
-    to: destination ? destination.warehouseName : req.body.destinationWarehouseName || 'Destination Warehouse',
+    to: destination ? destination.warehouseName : destinationWarehouse.name,
     quantity: qty,
   });
 

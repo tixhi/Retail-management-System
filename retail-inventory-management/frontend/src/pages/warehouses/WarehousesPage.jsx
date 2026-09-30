@@ -1,7 +1,10 @@
 import useApiCollection from '../../hooks/useApiCollection';
+import { useState } from 'react';
+import CreateRecordForm from '../../components/common/CreateRecordForm';
 
 export default function WarehousesPage() {
-  const { items: warehouses, loading, error } = useApiCollection('/warehouses');
+  const { items: warehouses, loading, error, setItems } = useApiCollection('/warehouses');
+  const [createOpen, setCreateOpen] = useState(false);
   if (loading) return <div className="card p-10 text-sm text-slate-500">Loading warehouses...</div>;
   if (error) return <div role="alert" className="card p-6 text-sm text-red-700">{error}</div>;
 
@@ -12,8 +15,28 @@ export default function WarehousesPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Network</p>
           <h1 className="mt-2 text-3xl font-semibold text-slate-900">Warehouses</h1>
         </div>
-        <button className="btn-primary">Add Warehouse</button>
+        <button type="button" className="btn-primary" onClick={() => setCreateOpen((open) => !open)}>Add Warehouse</button>
       </div>
+
+      {createOpen ? (
+        <CreateRecordForm
+          endpoint="/warehouses"
+          title="Add warehouse"
+          fields={[
+            { name: 'name', label: 'Warehouse name' },
+            { name: 'code', label: 'Warehouse code' },
+            { name: 'city', label: 'City' },
+            { name: 'address', label: 'Address', required: false },
+            { name: 'manager', label: 'Manager', required: false },
+            { name: 'contactNumber', label: 'Contact number', required: false },
+          ]}
+          onCancel={() => setCreateOpen(false)}
+          onCreated={(warehouse) => {
+            setItems((items) => [warehouse, ...items]);
+            setCreateOpen(false);
+          }}
+        />
+      ) : null}
 
       <div className="grid gap-4 xl:grid-cols-3">
         {warehouses.map((warehouse) => (

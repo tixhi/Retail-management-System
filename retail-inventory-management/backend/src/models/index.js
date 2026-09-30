@@ -77,11 +77,14 @@ const Inventory = defineModel('Inventory', {
 const Order = defineModel('Order', {
   orderId: { type: String, required: true },
   customer: { type: String, required: true },
+  customerEmail: { type: String, default: '', lowercase: true, trim: true },
   items: { type: [Schema.Types.Mixed], default: [] },
   warehouse: { type: String, default: '' },
   totalAmount: { type: Number, default: 0, min: 0 },
   status: { type: String, default: 'Pending' },
   paymentStatus: { type: String, default: 'Pending' },
+  paymentMethod: { type: String, default: 'Cash on delivery' },
+  shippingAddress: { type: String, default: '' },
   fulfillmentStatus: { type: String, default: 'Pending' },
   externalId: { type: String, default: '' },
 }, [{ fields: { orderId: 1 }, options: { unique: true } }]);

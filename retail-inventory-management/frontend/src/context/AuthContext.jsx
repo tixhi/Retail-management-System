@@ -17,6 +17,16 @@ export function AuthProvider({ children }) {
     return payload;
   };
 
+  const registerAdmin = async (details) => {
+    const { data } = await api.post('/auth/signup-admin', details);
+    const payload = data.data;
+    localStorage.setItem('rim_token', payload.token);
+    localStorage.setItem('rim_user', JSON.stringify(payload.user));
+    setToken(payload.token);
+    setUser(payload.user);
+    return payload;
+  };
+
   const logout = () => {
     localStorage.removeItem('rim_token');
     localStorage.removeItem('rim_user');
@@ -29,6 +39,7 @@ export function AuthProvider({ children }) {
       user,
       token,
       login,
+      registerAdmin,
       logout,
       isAuthenticated: !!token,
     }),

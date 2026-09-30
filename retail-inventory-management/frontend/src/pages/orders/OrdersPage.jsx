@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import useApiCollection from '../../hooks/useApiCollection';
+import CreateRecordForm from '../../components/common/CreateRecordForm';
 
 export default function OrdersPage() {
-  const { items: orders, loading, error } = useApiCollection('/orders');
+  const { items: orders, loading, error, setItems } = useApiCollection('/orders');
   const [search, setSearch] = useState('');
+  const [createOpen, setCreateOpen] = useState(false);
   const filteredOrders = orders.filter((order) => `${order.orderId} ${order.customer}`.toLowerCase().includes(search.toLowerCase()));
 
   if (loading) return <div className="card p-10 text-sm text-slate-500">Loading orders...</div>;
@@ -16,8 +18,28 @@ export default function OrdersPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Commercial</p>
           <h1 className="mt-2 text-3xl font-semibold text-slate-900">Orders</h1>
         </div>
-        <button className="btn-primary">Create Order</button>
+        <button type="button" className="btn-primary" onClick={() => setCreateOpen((open) => !open)}>Create Order</button>
       </div>
+
+      {createOpen ? (
+        <CreateRecordForm
+          endpoint="/orders"
+          title="Create order"
+          fields={[
+            { name: 'customer', label: 'Customer' },
+            { name: 'warehouse', label: 'Warehouse' },
+            { name: 'product', label: 'Product' },
+            { name: 'quantity', label: 'Quantity', type: 'number', min: 1, step: 1 },
+            { name: 'totalAmount', label: 'Order total', type: 'number' },
+          ]}
+          buildPayload={({ customer, warehouse, product, quantity, totalAmount }) => ({ customer, warehouse, totalAmount, items: [{ product, quantity }] })}
+          onCancel={() => setCreateOpen(false)}
+          onCreated={(order) => {
+            setItems((items) => [order, ...items]);
+            setCreateOpen(false);
+          }}
+        />
+      ) : null}
 
       <div className="card p-4">
         <div className="relative max-w-md">

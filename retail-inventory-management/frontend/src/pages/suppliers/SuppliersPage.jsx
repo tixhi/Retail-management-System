@@ -1,7 +1,10 @@
 import useApiCollection from '../../hooks/useApiCollection';
+import { useState } from 'react';
+import CreateRecordForm from '../../components/common/CreateRecordForm';
 
 export default function SuppliersPage() {
-  const { items: suppliers, loading, error } = useApiCollection('/suppliers');
+  const { items: suppliers, loading, error, setItems } = useApiCollection('/suppliers');
+  const [createOpen, setCreateOpen] = useState(false);
   if (loading) return <div className="card p-10 text-sm text-slate-500">Loading suppliers...</div>;
   if (error) return <div role="alert" className="card p-6 text-sm text-red-700">{error}</div>;
 
@@ -12,8 +15,28 @@ export default function SuppliersPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Procurement</p>
           <h1 className="mt-2 text-3xl font-semibold text-slate-900">Suppliers</h1>
         </div>
-        <button className="btn-primary">Add Supplier</button>
+        <button type="button" className="btn-primary" onClick={() => setCreateOpen((open) => !open)}>Add Supplier</button>
       </div>
+
+      {createOpen ? (
+        <CreateRecordForm
+          endpoint="/suppliers"
+          title="Add supplier"
+          fields={[
+            { name: 'companyName', label: 'Company name' },
+            { name: 'contactPerson', label: 'Contact person' },
+            { name: 'email', label: 'Email', type: 'email', required: false },
+            { name: 'phone', label: 'Phone', required: false },
+            { name: 'address', label: 'Address', required: false },
+            { name: 'paymentTerms', label: 'Payment terms', required: false },
+          ]}
+          onCancel={() => setCreateOpen(false)}
+          onCreated={(supplier) => {
+            setItems((items) => [supplier, ...items]);
+            setCreateOpen(false);
+          }}
+        />
+      ) : null}
 
       <div className="card overflow-hidden">
         <table className="min-w-full divide-y divide-slate-200">

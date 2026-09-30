@@ -6,6 +6,7 @@ import {
   Boxes,
   ChartColumnBig,
   ClipboardList,
+  CreditCard,
   LayoutDashboard,
   LogOut,
   Package,
@@ -17,7 +18,10 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard, roles: ['Admin', 'Management', 'Inventory Manager', 'Sales Staff', 'Procurement Manager', 'Warehouse Staff'] },
+  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard, roles: ['Admin', 'Management', 'Inventory Manager', 'Sales Staff', 'Procurement Manager', 'Warehouse Staff', 'Customer'] },
+  { label: 'Catalog', to: '/catalog', icon: Package, roles: ['Customer'] },
+  { label: 'Checkout', to: '/checkout', icon: CreditCard, roles: ['Customer'] },
+  { label: 'My Orders', to: '/my-orders', icon: ClipboardList, roles: ['Customer'] },
   { label: 'Products', to: '/products', icon: Package, roles: ['Admin', 'Inventory Manager'] },
   { label: 'Inventory', to: '/inventory', icon: Boxes, roles: ['Admin', 'Inventory Manager', 'Warehouse Staff'] },
   { label: 'Warehouses', to: '/warehouses', icon: Warehouse, roles: ['Admin', 'Inventory Manager'] },

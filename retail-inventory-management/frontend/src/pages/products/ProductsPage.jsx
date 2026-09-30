@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, SlidersHorizontal } from 'lucide-react';
 import api from '../../services/api';
+import CreateRecordForm from '../../components/common/CreateRecordForm';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -42,8 +44,29 @@ export default function ProductsPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Catalog</p>
           <h1 className="mt-2 text-3xl font-semibold text-slate-900">Products</h1>
         </div>
-        <button className="btn-primary"><Plus size={16} className="mr-2" /> Add Product</button>
+        <button type="button" className="btn-primary" onClick={() => setCreateOpen((open) => !open)}><Plus size={16} className="mr-2" /> Add Product</button>
       </div>
+
+      {createOpen ? (
+        <CreateRecordForm
+          endpoint="/products"
+          title="Add product"
+          fields={[
+            { name: 'name', label: 'Product name' },
+            { name: 'sku', label: 'SKU' },
+            { name: 'category', label: 'Category' },
+            { name: 'price', label: 'Selling price', type: 'number' },
+            { name: 'costPrice', label: 'Unit cost', type: 'number' },
+            { name: 'reorderLevel', label: 'Reorder level', type: 'number' },
+            { name: 'supplier', label: 'Supplier', required: false },
+          ]}
+          onCancel={() => setCreateOpen(false)}
+          onCreated={(product) => {
+            setProducts((items) => [product, ...items]);
+            setCreateOpen(false);
+          }}
+        />
+      ) : null}
 
       <div className="card p-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
